@@ -1,0 +1,9 @@
+services:
+  worklog-analytics:
+    build: .
+    container_name: worklog-analytics-container
+    ports:
+      - "8003:8003"
+    volumes:
+      - /home/junior/trello-dashboard/data:/home/junior/trello-dashboard/data:ro
+    restart: unless-stopped
