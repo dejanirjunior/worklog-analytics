@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus lançamentos</title>
+    <style>
+        :root {
+            --bg: #eef2f7;
+            --panel: #ffffff;
+            --line: #d6dde7;
+            --text: #1f2937;
+            --muted: #667085;
+            --blue: #0d6efd;
+            --blue-dark: #0b5ed7;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .page-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .header, .card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+            margin-bottom: 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            margin: 0 0 6px 0;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .actions a {
+            text-decoration: none;
+            color: white;
+            background: var(--blue);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .actions a.secondary {
+            background: #475467;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 260px 180px 180px auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #344054;
+        }
+
+        select,
+        input[type="date"] {
+            width: 100%;
+            border: 1px solid #cfd6df;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-family: inherit;
+            font-size: 13px;
+            background: white;
+            color: var(--text);
+        }
+
+        .btn,
+        .primary-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn {
+            background: #475467;
+            color: white;
+        }
+
+        .primary-btn {
+            background: var(--blue);
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: var(--blue-dark);
+        }
+
+        .summary-box {
+            background: #eef4ff;
+            border: 1px solid #d7e3ff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #38517a;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #eef2f7;
+        }
+
+        th, td {
+            padding: 9px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 1100px) {
+            .filters {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <div class="header">
+        <div class="header-top">
+            <div>
+                <h1>Meus lançamentos</h1>
+                <p class="subtitle">Consulta dos registros lançados, com filtro por desenvolvedor e período.</p>
+            </div>
+
+            <div class="actions">
+                <a class="secondary" href="/">⏱️ Lançar horas</a>
+                <a href="/daily">📅 Daily</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <form method="GET" action="/worklog_history" class="filters">
+            <div class="field">
+                <label for="developer_name">Desenvolvedor</label>
+                <select id="developer_name" name="developer_name">
+                    <option value="">Todos</option>
+                    {% for dev in developers %}
+                        <option value="{{ dev }}" {% if dev == selected_dev %}selected{% endif %}>{{ dev }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="start_date">Data inicial</label>
+                <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+            </div>
+
+            <div class="field">
+                <label for="end_date">Data final</label>
+                <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:end;">
+                <button type="submit" class="primary-btn">Aplicar filtros</button>
+                <a href="/worklog_history" class="btn">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="summary-box">
+            Total de horas no período: <strong>{{ total_hours }}h</strong>
+        </div>
+    </div>
+
+    <div class="card">
+        {% if worklogs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Dev</th>
+                    <th>Card</th>
+                    <th>Horas</th>
+                    <th>Atividade</th>
+                    <th>Comentário</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in worklogs %}
+                <tr>
+                    <td>{{ row.work_date }}</td>
+                    <td>{{ row.developer_name }}</td>
+                    <td>{{ row.card_name }}</td>
+                    <td>{{ row.hours }}</td>
+                    <td>{{ row.activity_type }}</td>
+                    <td>{{ row.comment }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="muted">Nenhum lançamento encontrado para os filtros informados.</div>
+        {% endif %}
+    </div>
+
+</div>
+</body>
+</html>
+
+

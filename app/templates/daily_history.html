@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Histórico da Daily</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #eef2f7;
+        margin: 0;
+        padding: 20px;
+        color: #1f2937;
+    }
+
+    .page-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        border: 1px solid #d6dde7;
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+    }
+
+    .header h1 {
+        margin: 0 0 6px 0;
+    }
+
+    .header p {
+        margin: 0;
+        color: #667085;
+    }
+
+    .actions {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .actions a {
+        text-decoration: none;
+        color: white;
+        background: #0d6efd;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .actions a.secondary {
+        background: #475467;
+    }
+
+    .filters-box {
+        margin-top: 14px;
+        background: #f8fbff;
+        border: 1px solid #dbe5f0;
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .filters-form {
+        display: grid;
+        grid-template-columns: 260px 180px 180px auto;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .history-card {
+        background: white;
+        border: 1px solid #d6dde7;
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(16,24,40,0.05);
+    }
+
+    .history-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .dev-name {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .date-pill {
+        background: #eef4ff;
+        border: 1px solid #d7e3ff;
+        color: #355070;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .section {
+        border: 1px solid #e3e8ef;
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 12px;
+        background: #fbfcfe;
+    }
+
+    .section-title {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #111827;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+        border: 1px solid #d8e0ea;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        font-size: 13px;
+    }
+
+    .table th {
+        background: #f3f6fa;
+    }
+
+    .warning {
+        color: #9b1c1c;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .muted {
+        color: #667085;
+    }
+
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #344054;
+    }
+
+    input[type="date"], select {
+        width: 100%;
+        border: 1px solid #cfd6df;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 13px;
+        background: white;
+        color: #1f2937;
+        padding: 8px 10px;
+    }
+
+    .filter-button,
+    .clear-button {
+        border: none;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        width: auto;
+    }
+
+    .filter-button {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .clear-button {
+        background: #475467;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (max-width: 980px) {
+        .filters-form {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+    <div class="header">
+        <h1>Histórico da Daily</h1>
+        <p>Visualização das dailies já salvas no banco, com cards, bloqueios e ausências.</p>
+
+        <div class="actions">
+            <a class="secondary" href="/daily">Voltar para Daily</a>
+        </div>
+
+        <div class="filters-box">
+            <form method="GET" action="/daily_history" class="filters-form">
+                <div>
+                    <label>Desenvolvedor</label>
+                    <select name="developer_name">
+                        <option value="">Todos</option>
+                        {% for dev in developers %}
+                            <option value="{{ dev }}" {% if dev == selected_dev %}selected{% endif %}>
+                                {{ dev }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label>Data inicial</label>
+                    <input type="date" name="start_date" value="{{ start_date }}">
+                </div>
+
+                <div>
+                    <label>Data final</label>
+                    <input type="date" name="end_date" value="{{ end_date }}">
+                </div>
+
+                <div style="display:flex; gap:10px; align-items:flex-end;">
+                    <button type="submit" class="filter-button">Aplicar filtros</button>
+                    <a href="/daily_history" class="clear-button">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if history %}
+        {% for row in history %}
+        <div class="history-card">
+            <div class="history-top">
+                <div class="dev-name">{{ row.developer_name }}</div>
+                <div class="date-pill">{{ row.daily_date_br }}</div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Cards planejados na daily</div>
+
+                {% if row.plan_cards %}
+                <table class="table">
+                    <tr>
+                        <th>Card</th>
+                        <th>Cliente</th>
+                        <th>Origem</th>
+                        <th>Bloqueio</th>
+                        <th>Status BLOCK</th>
+                    </tr>
+                    {% for card in row.plan_cards %}
+                    <tr>
+                        <td>{{ card.card_name }}</td>
+                        <td>{{ card.client_name or '-' }}</td>
+                        <td>{{ card.source_type }}</td>
+                        <td>{{ card.blocker_text or '-' }}</td>
+                        <td>
+                            {% if card.needs_block_label_mark == 1 %}
+                                <span class="warning">Marcar BLOCK no Trello</span>
+                            {% elif card.trello_has_block_label == 1 %}
+                                BLOCK já marcado
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <div class="muted">Sem cards salvos nesta daily.</div>
+                {% endif %}
+            </div>
+
+            <div class="section">
+                <div class="section-title">Ausência</div>
+                <div><strong>Tipo:</strong> {{ row.absence_type or 'Sem ausência' }}</div>
+                <div><strong>Detalhe:</strong> {{ row.absence_detail or '-' }}</div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Observação geral</div>
+                <div>{{ row.notes or '-' }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="history-card">
+            <div class="muted">Nenhum registro encontrado para os filtros informados.</div>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

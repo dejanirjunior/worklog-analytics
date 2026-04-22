@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Visão Gerencial</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f0f0f0; }
+        .highlight { background: #ffe6e6; }
+    </style>
+</head>
+<body>
+
+<h2>Visão Gerencial (Pareto)</h2>
+
+<p>Período: {{ start_date }} até {{ end_date }}</p>
+<p>Total de horas: {{ grand_total }}</p>
+
+<table>
+    <tr>
+        <th>Card</th>
+        <th>Horas</th>
+        <th>%</th>
+        <th>% Acumulado</th>
+    </tr>
+
+    {% for row in pareto %}
+        <tr class="{% if row.accumulated >= 80 %}highlight{% endif %}">
+            <td>{{ row.card_name }}</td>
+            <td>{{ row.hours }}</td>
+            <td>{{ row.pct }}%</td>
+            <td>{{ row.accumulated }}%</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/">Voltar</a>
+
+</body>
+</html>

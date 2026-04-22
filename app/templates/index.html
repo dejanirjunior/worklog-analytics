@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worklog Analytics</title>
+    <style>
+        :root {
+            --bg: #eef2f7;
+            --panel: #ffffff;
+            --line: #d6dde7;
+            --text: #1f2937;
+            --muted: #667085;
+            --blue: #0d6efd;
+            --blue-dark: #0b5ed7;
+            --warn-bg: #fff8e8;
+            --warn-border: #f4deb0;
+            --warn-text: #8a5a00;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .page-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .header, .card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+            margin-bottom: 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            margin: 0 0 6px 0;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .actions a {
+            text-decoration: none;
+            color: white;
+            background: var(--blue);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .actions a.secondary {
+            background: #475467;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e8edf3;
+        }
+
+        .top-filters {
+            display: grid;
+            grid-template-columns: 180px 280px auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #344054;
+        }
+
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            border: 1px solid #cfd6df;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-family: inherit;
+            font-size: 13px;
+            background: white;
+            color: var(--text);
+        }
+
+        textarea {
+            min-height: 54px;
+            resize: vertical;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 16px;
+        }
+
+        .cards-scroll {
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .card-pick {
+            border: 1px solid #e4e9f0;
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            background: white;
+        }
+
+        .card-pick label {
+            display: grid;
+            grid-template-columns: 18px 1fr;
+            gap: 10px;
+            align-items: start;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .card-main {
+            font-size: 13px;
+            font-weight: 700;
+            color: #182230;
+            margin-bottom: 3px;
+        }
+
+        .card-meta {
+            font-size: 12px;
+            color: #667085;
+        }
+
+        .warn-badge {
+            display: inline-block;
+            margin-top: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--warn-text);
+            background: var(--warn-bg);
+            border: 1px solid var(--warn-border);
+            border-radius: 999px;
+            padding: 2px 8px;
+        }
+
+        .launch-row {
+            border: 1px solid #dfe6ef;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: white;
+        }
+
+        .launch-row-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #182230;
+            margin-bottom: 6px;
+        }
+
+        .launch-row-meta {
+            font-size: 12px;
+            color: #667085;
+            margin-bottom: 8px;
+        }
+
+        .launch-grid {
+            display: grid;
+            grid-template-columns: 90px 180px 1fr;
+            gap: 8px;
+            align-items: start;
+        }
+
+        .summary-box {
+            background: #eef4ff;
+            border: 1px solid #d7e3ff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #38517a;
+            font-size: 13px;
+            line-height: 1.4;
+            margin-top: 12px;
+        }
+
+        .save-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 18px;
+        }
+
+        .btn,
+        .save-button {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn {
+            background: #475467;
+            color: white;
+        }
+
+        .save-button {
+            background: var(--blue);
+            color: white;
+            min-width: 180px;
+        }
+
+        .save-button:hover {
+            background: var(--blue-dark);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #eef2f7;
+        }
+
+        th, td {
+            padding: 9px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 1100px) {
+            .grid-2,
+            .launch-grid,
+            .top-filters {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <div class="header">
+        <div class="header-top">
+            <div>
+                <h1>Registro diário de horas</h1>
+                <p class="subtitle">Lançamento operacional compacto, com múltiplos cards na mesma tela.</p>
+            </div>
+
+            <div class="actions">
+                <a class="secondary" href="/daily">📅 Daily</a>
+                <a href="/worklog_history">📋 Meus lançamentos</a>
+                <a href="/daily_history">🕘 Histórico da daily</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">Filtros e contexto</div>
+
+        <form method="GET" action="/" class="top-filters">
+            <div class="field">
+                <label for="work_date">Data</label>
+                <input type="date" id="work_date" name="work_date" value="{{ today }}">
+            </div>
+
+            <div class="field">
+                <label for="developer_name">Desenvolvedor</label>
+                <select id="developer_name" name="developer_name">
+                    <option value="">Selecione</option>
+                    {% for dev in developers %}
+                        <option value="{{ dev }}" {% if dev == selected_dev %}selected{% endif %}>{{ dev }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:end;">
+                <button type="submit" class="save-button" style="min-width:160px;">Carregar tela</button>
+                <a href="/" class="btn">Limpar</a>
+            </div>
+        </form>
+
+        <div class="summary-box">
+            Selecione o desenvolvedor e a data. Depois marque os cards trabalhados no dia e distribua as horas entre eles.
+        </div>
+    </div>
+
+    <form method="POST" action="/save_worklog_batch">
+        <input type="hidden" name="work_date" value="{{ today }}">
+        <input type="hidden" name="developer_name" value="{{ selected_dev }}">
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="section-title">Selecionar cards</div>
+
+                <div class="field" style="margin-bottom:10px;">
+                    <label for="card-search">Buscar card ou cliente</label>
+                    <input type="text" id="card-search" placeholder="Digite para filtrar...">
+                </div>
+
+                <div class="cards-scroll" id="cards-picker">
+                    {% for card in cards %}
+                    <div class="card-pick pick-item" data-search="{{ (card.card_name ~ ' ' ~ (card.client_name or ''))|lower }}">
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="card-selector"
+                                value="{{ card.card_id }}"
+                                data-card-id="{{ card.card_id }}"
+                                data-card-name="{{ card.card_name }}"
+                                data-client-name="{{ card.client_name }}"
+                                data-lista="{{ card.lista }}"
+                                data-estimated-flag="{{ card.estimated_flag }}"
+                            >
+                            <div>
+                                <div class="card-main">{{ card.card_name }}</div>
+                                <div class="card-meta">
+                                    Cliente: {{ card.client_name or '-' }} | Etapa: {{ card.lista or '-' }}
+                                </div>
+                                {% if card.estimated_flag == 0 %}
+                                    <div class="warn-badge">Sem estimativa</div>
+                                {% endif %}
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">Lançamentos selecionados</div>
+
+                <div id="selected-launches">
+                    <div class="muted">Marque um ou mais cards à esquerda para lançar horas.</div>
+                </div>
+
+                <div class="save-bar">
+                    <button type="submit" class="save-button">Salvar lançamentos</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% if selected_dev %}
+    <div class="card">
+        <div class="section-title">Lançamentos já registrados no dia</div>
+
+        <div class="summary-box" style="margin-bottom:12px;">
+            Total lançado para o filtro atual: <strong>{{ total_hours }}h</strong>
+        </div>
+
+        {% if worklogs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Dev</th>
+                    <th>Card</th>
+                    <th>Horas</th>
+                    <th>Atividade</th>
+                    <th>Comentário</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in worklogs %}
+                <tr>
+                    <td>{{ row.work_date }}</td>
+                    <td>{{ row.developer_name }}</td>
+                    <td>{{ row.card_name }}</td>
+                    <td>{{ row.hours }}</td>
+                    <td>{{ row.activity_type }}</td>
+                    <td>{{ row.comment }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="muted">Nenhum lançamento encontrado para o filtro atual.</div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    const picker = document.getElementById("cards-picker");
+    const searchInput = document.getElementById("card-search");
+    const selectedLaunches = document.getElementById("selected-launches");
+    const selectedDev = "{{ selected_dev }}";
+
+    function filterCards() {
+        const term = (searchInput.value || "").trim().toLowerCase();
+        const items = picker.querySelectorAll(".pick-item");
+
+        items.forEach(item => {
+            const haystack = item.dataset.search || "";
+            item.style.display = (!term || haystack.includes(term)) ? "" : "none";
+        });
+    }
+
+    function buildLaunchRow(checkbox) {
+        const cardId = checkbox.dataset.cardId;
+        const cardName = checkbox.dataset.cardName || "";
+        const clientName = checkbox.dataset.clientName || "";
+        const lista = checkbox.dataset.lista || "";
+        const estimatedFlag = checkbox.dataset.estimatedFlag || "1";
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "launch-row";
+        wrapper.id = `launch-row-${cardId}`;
+
+        wrapper.innerHTML = `
+            <input type="hidden" name="selected_cards" value="${cardId}">
+            <input type="hidden" name="card_name__${cardId}" value="${escapeHtmlAttr(cardName)}">
+            <input type="hidden" name="estimated_flag__${cardId}" value="${estimatedFlag}">
+
+            <div class="launch-row-title">${escapeHtml(cardName)}</div>
+            <div class="launch-row-meta">
+                Cliente: ${escapeHtml(clientName || "-")} | Etapa: ${escapeHtml(lista || "-")}
+                ${estimatedFlag === "0" ? ' | <span style="color:#8a5a00;font-weight:700;">Sem estimativa</span>' : ""}
+            </div>
+
+            <div class="launch-grid">
+                <div>
+                    <label>Horas</label>
+                    <input type="number" name="hours__${cardId}" min="0.25" step="0.25" placeholder="0">
+                </div>
+
+                <div>
+                    <label>Atividade</label>
+                    <select name="activity_type__${cardId}">
+                        <option value="">Selecione</option>
+                        <option value="desenvolvimento">Desenvolvimento</option>
+                        <option value="qa">QA</option>
+                        <option value="uat">UAT</option>
+                        <option value="suporte">Suporte</option>
+                        <option value="planejamento">Planejamento</option>
+                        <option value="refinamento">Refinamento</option>
+                        <option value="reuniao">Reunião</option>
+                        <option value="documentacao">Documentação</option>
+                        <option value="analise">Análise</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Comentário</label>
+                    <textarea name="comment__${cardId}" placeholder="O que foi feito neste card?"></textarea>
+                </div>
+            </div>
+        `;
+
+        return wrapper;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.innerText = text || "";
+        return div.innerHTML;
+    }
+
+    function escapeHtmlAttr(text) {
+        return String(text || "")
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
+    function refreshSelectedCards() {
+        const checked = document.querySelectorAll(".card-selector:checked");
+        selectedLaunches.innerHTML = "";
+
+        if (!selectedDev) {
+            selectedLaunches.innerHTML = `<div class="muted">Selecione o desenvolvedor no topo antes de lançar horas.</div>`;
+            document.querySelectorAll(".card-selector").forEach(cb => cb.checked = false);
+            return;
+        }
+
+        if (checked.length === 0) {
+            selectedLaunches.innerHTML = `<div class="muted">Marque um ou mais cards à esquerda para lançar horas.</div>`;
+            return;
+        }
+
+        checked.forEach(cb => {
+            selectedLaunches.appendChild(buildLaunchRow(cb));
+        });
+    }
+
+    document.querySelectorAll(".card-selector").forEach(cb => {
+        cb.addEventListener("change", refreshSelectedCards);
+    });
+
+    searchInput.addEventListener("input", filterCards);
+</script>
+</body>
+</html>
+
+

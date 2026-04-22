@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Daily</title>
+
+<style>
+    :root {
+        --bg: #eef2f7;
+        --panel: #ffffff;
+        --line: #d6dde7;
+        --text: #1f2937;
+        --muted: #667085;
+        --danger-bg: #fff4f4;
+        --danger-border: #f1c7c7;
+        --danger-text: #9b1c1c;
+        --warn-bg: #fff8e8;
+        --warn-border: #f4deb0;
+        --warn-text: #8a5a00;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 20px;
+    }
+
+    .page-wrap {
+        max-width: 1250px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    }
+
+    .page-topline {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+    }
+
+    .page-subtitle {
+        color: var(--muted);
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .page-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .page-actions a {
+        text-decoration: none;
+        color: white;
+        background: #0d6efd;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .page-actions a.secondary {
+        background: #475467;
+    }
+
+    .filters-box {
+        margin-top: 14px;
+        background: #f8fbff;
+        border: 1px solid #dbe5f0;
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .filters-form {
+        display: grid;
+        grid-template-columns: 220px 280px auto;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .helper-box {
+        margin-top: 12px;
+        background: #eef4ff;
+        border: 1px solid #d7e3ff;
+        border-radius: 10px;
+        padding: 10px 12px;
+        color: #38517a;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .dev-card {
+        border-radius: 16px;
+        margin-bottom: 18px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+    }
+
+    .dev-top {
+        padding: 14px 16px;
+        color: white;
+        font-weight: 700;
+        font-size: 20px;
+    }
+
+    .dev-color-0 .dev-top { background: linear-gradient(90deg, #2563eb, #3b82f6); }
+    .dev-color-1 .dev-top { background: linear-gradient(90deg, #6d28d9, #8b5cf6); }
+    .dev-color-2 .dev-top { background: linear-gradient(90deg, #047857, #10b981); }
+    .dev-color-3 .dev-top { background: linear-gradient(90deg, #c2410c, #f97316); }
+
+    .dev-body {
+        padding: 14px;
+        background: #f9fbfd;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 12px;
+    }
+
+    .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .section {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #111827;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #e8edf3;
+    }
+
+    .instruction {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 8px;
+        line-height: 1.4;
+    }
+
+    .card-line {
+        border: 1px solid #e4e9f0;
+        border-radius: 10px;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        background: #fbfcfe;
+    }
+
+    .card-line label {
+        display: grid;
+        grid-template-columns: 20px 1fr;
+        gap: 10px;
+        align-items: start;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .card-line input[type="checkbox"] {
+        margin-top: 2px;
+    }
+
+    .card-main {
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 3px;
+        color: #182230;
+    }
+
+    .card-meta {
+        font-size: 12px;
+        color: #667085;
+        line-height: 1.35;
+    }
+
+    .score-line {
+        font-size: 11px;
+        color: #41546b;
+        margin-top: 4px;
+    }
+
+    .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #eef2f7;
+        color: #475467;
+        font-size: 11px;
+        font-weight: 700;
+        margin-left: 6px;
+    }
+
+    .pill-assigned {
+        background: #e8f1ff;
+        color: #1d4ed8;
+    }
+
+    .pill-help {
+        background: #fff4e8;
+        color: #b45309;
+    }
+
+    .inactive-card {
+        border: 1px solid var(--warn-border);
+        background: var(--warn-bg);
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 8px;
+    }
+
+    .inactive-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--warn-text);
+        margin-bottom: 4px;
+    }
+
+    .inactive-meta {
+        font-size: 12px;
+        color: #7a5a13;
+    }
+
+    .blocker-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .blocker-item {
+        border: 1px solid var(--danger-border);
+        background: var(--danger-bg);
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .blocker-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #5f1717;
+        margin-bottom: 8px;
+    }
+
+    .block-warning {
+        color: var(--danger-text);
+        font-size: 11px;
+        margin-top: 6px;
+        font-weight: 700;
+    }
+
+    .week-summary {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .week-box {
+        border: 1px solid #d8e1ec;
+        border-radius: 10px;
+        background: #f8fbff;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .week-box-label {
+        font-size: 11px;
+        color: #667085;
+        margin-bottom: 4px;
+        font-weight: 700;
+    }
+
+    .week-box-value {
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .search-box {
+        margin-bottom: 10px;
+    }
+
+    .search-input {
+        width: 100%;
+        border: 1px solid #cfd6df;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 13px;
+        background: white;
+        color: var(--text);
+        padding: 9px 10px;
+    }
+
+    .search-result {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 8px;
+    }
+
+    .cards-scroll {
+        max-height: 380px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    label.field-label {
+        display: block;
+        font-weight: 700;
+        margin-top: 10px;
+        margin-bottom: 6px;
+        font-size: 13px;
+        color: #344054;
+    }
+
+    input[type="text"],
+    textarea,
+    select,
+    input[type="date"] {
+        width: 100%;
+        border: 1px solid #cfd6df;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 13px;
+        background: white;
+        color: var(--text);
+    }
+
+    input[type="text"],
+    select,
+    input[type="date"] {
+        padding: 8px 10px;
+    }
+
+    textarea {
+        padding: 8px 10px;
+        resize: vertical;
+        min-height: 60px;
+    }
+
+    .textarea-sm { min-height: 56px; }
+    .textarea-xs { min-height: 48px; }
+
+    .muted {
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .save-bar {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 18px;
+    }
+
+    .save-button,
+    .filter-button,
+    .clear-button {
+        border: none;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        width: auto;
+    }
+
+    .save-button {
+        background: #0d6efd;
+        color: white;
+        box-shadow: 0 3px 8px rgba(13, 110, 253, 0.18);
+        min-width: 180px;
+    }
+
+    .save-button:hover,
+    .filter-button:hover {
+        background: #0b5ed7;
+    }
+
+    .filter-button {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .clear-button {
+        background: #475467;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (max-width: 980px) {
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+
+        .week-summary {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .filters-form {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+    <div class="page-header">
+        <div class="page-topline">
+            <div>
+                <h1 class="page-title">Daily</h1>
+                <p class="page-subtitle">Data da daily: <strong>{{ today_br }}</strong></p>
+            </div>
+
+            <div class="page-actions">
+                <a class="secondary" href="/daily_history">Histórico da daily</a>
+            </div>
+        </div>
+
+        <div class="filters-box">
+            <form method="GET" action="/daily" class="filters-form">
+                <div>
+                    <label class="field-label">Data da daily</label>
+                    <input type="date" name="date" value="{{ today_iso }}">
+                </div>
+
+                <div>
+                    <label class="field-label">Desenvolvedor</label>
+                    <select name="developer_name">
+                        <option value="">Todos</option>
+                        {% for dev in developers %}
+                            <option value="{{ dev }}" {% if dev == selected_dev %}selected{% endif %}>
+                                {{ dev }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="display:flex; gap:10px; align-items:flex-end;">
+                    <button type="submit" class="filter-button">Aplicar filtros</button>
+                    <a href="/daily" class="clear-button">Limpar</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="helper-box">
+            Os cards sugeridos já vêm marcados. O score da sugestão considera histórico recente, etapa, prioridade, risco, prazo e bloqueio.
+            Cards inativos há mais de 10 dias aparecem pedindo ação.
+        </div>
+    </div>
+
+    <form method="POST" action="/save_daily">
+        <input type="hidden" name="date" value="{{ today_iso }}">
+
+        {% for d in data %}
+        <div class="dev-card {{ d.color }}">
+            <div class="dev-top">{{ d.dev }}</div>
+            <div class="dev-body">
+                <input type="hidden" name="dev::{{ d.dev }}">
+
+                {% if is_friday and d.weekly_summary %}
+                <div class="section" style="margin-bottom: 12px;">
+                    <div class="section-title">Resumo da semana do dev</div>
+                    <div class="instruction">
+                        Período: {{ d.weekly_summary.monday_br }} a {{ d.weekly_summary.friday_br }}
+                    </div>
+                    <div class="week-summary">
+                        {% for day in d.weekly_summary.days %}
+                        <div class="week-box">
+                            <div class="week-box-label">{{ day[0] }}</div>
+                            <div class="week-box-value">{{ day[1] }}h</div>
+                        </div>
+                        {% endfor %}
+                        <div class="week-box">
+                            <div class="week-box-label">Total</div>
+                            <div class="week-box-value">{{ d.weekly_summary.total }}h</div>
+                        </div>
+                    </div>
+                    <div class="instruction">
+                        Diferença para 40h: {{ d.weekly_summary.difference }}h
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="grid-2">
+                    <div class="stack">
+                        <div class="section">
+                            <div class="section-title">Cards sugeridos para hoje</div>
+
+                            {% if d.suggested %}
+                                {% for c in d.suggested %}
+                                <div class="card-line">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="item::{{ d.dev }}::suggested::{{ loop.index }}"
+                                            value="{{ c.card_id }}|{{ c.card_name }}|{{ c.client_name }}|suggested|{{ c.has_block_label }}"
+                                            checked
+                                            data-dev="{{ d.dev }}"
+                                            data-card-id="{{ c.card_id }}"
+                                            data-card-name="{{ c.card_name }}"
+                                            data-client-name="{{ c.client_name }}"
+                                            data-has-block-label="{{ c.has_block_label }}"
+                                            onchange="syncBlockers('{{ d.dev }}')"
+                                        >
+                                        <div>
+                                            <div class="card-main">
+                                                {{ c.card_name }}
+                                                {% if c.is_assigned_to_dev %}
+                                                    <span class="pill pill-assigned">Atribuído</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="card-meta">
+                                                Cliente: {{ c.client_name or '-' }} |
+                                                Etapa: {{ c.lista or '-' }} |
+                                                Horas recentes: {{ c.hours_recent }}
+                                            </div>
+                                            <div class="score-line">
+                                                Score {{ c.score }} — {{ c.reason_text }}
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="muted">Sem sugestão automática suficiente para este dev.</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">Cards inativos pedindo ação</div>
+
+                            {% if d.inactive_cards %}
+                                {% for c in d.inactive_cards %}
+                                <div class="inactive-card">
+                                    <div class="inactive-title">{{ c.card_name }}</div>
+                                    <div class="inactive-meta">
+                                        Cliente: {{ c.client_name or '-' }} |
+                                        Etapa: {{ c.lista or '-' }} |
+                                        Sem atividade há {{ c.inactive_days }} dias
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="muted">Nenhum card inativo pedindo ação.</div>
+                            {% endif %}
+
+                            <div class="instruction">
+                                Se necessário, oriente o dev a atualizar comentários, confirmar andamento ou reposicionar a demanda.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">Adicionar mais cards à daily</div>
+
+                            <div class="search-box">
+                                <input
+                                    type="text"
+                                    class="search-input"
+                                    id="search-{{ loop.index0 }}"
+                                    placeholder="Buscar por nome do card ou cliente..."
+                                    oninput="filterAdditionalCards('cards-{{ loop.index0 }}', 'search-{{ loop.index0 }}', 'result-{{ loop.index0 }}')"
+                                >
+                            </div>
+
+                            <div class="search-result" id="result-{{ loop.index0 }}">
+                                {{ d.additional_cards|length }} cards disponíveis
+                            </div>
+
+                            <div class="cards-scroll" id="cards-{{ loop.index0 }}">
+                                {% if d.additional_cards %}
+                                    {% for c in d.additional_cards %}
+                                    <div class="card-line additional-card-item" data-search="{{ (c.card_name ~ ' ' ~ (c.client_name or ''))|lower }}">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="item::{{ d.dev }}::manual::{{ loop.index }}"
+                                                value="{{ c.card_id }}|{{ c.card_name }}|{{ c.client_name }}|manual|{{ c.has_block_label }}"
+                                                data-dev="{{ d.dev }}"
+                                                data-card-id="{{ c.card_id }}"
+                                                data-card-name="{{ c.card_name }}"
+                                                data-client-name="{{ c.client_name }}"
+                                                data-has-block-label="{{ c.has_block_label }}"
+                                                onchange="syncBlockers('{{ d.dev }}')"
+                                            >
+                                            <div>
+                                                <div class="card-main">
+                                                    {{ c.card_name }}
+                                                    {% if c.is_assigned_to_dev %}
+                                                        <span class="pill pill-assigned">Atribuído</span>
+                                                    {% else %}
+                                                        <span class="pill pill-help">Não atribuído</span>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-meta">
+                                                    Cliente: {{ c.client_name or '-' }} |
+                                                    Etapa: {{ c.lista or '-' }}
+                                                </div>
+                                                <div class="score-line">
+                                                    Score {{ c.score }} — {{ c.reason_text }}
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="muted">Sem cards adicionais elegíveis no momento.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stack">
+                        <div class="section">
+                            <div class="section-title">Bloqueios por card selecionado</div>
+                            <div id="blockers-{{ d.dev }}" class="blocker-container"></div>
+                            <div class="instruction">
+                                Cada card marcado aparece abaixo para registrar bloqueio específico da demanda.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">Ausência</div>
+
+                            <label class="field-label">Tipo de ausência</label>
+                            <select name="absence_type::{{ d.dev }}">
+                                <option value="">Sem ausência</option>
+                                <option value="agenda_pessoal">Agenda pessoal</option>
+                                <option value="motivo_medico">Motivo médico</option>
+                                <option value="infra_energia">Infraestrutura - energia</option>
+                                <option value="infra_internet">Infraestrutura - internet</option>
+                                <option value="infra_computador">Infraestrutura - defeito no computador</option>
+                                <option value="infra_outro">Infraestrutura - outro</option>
+                            </select>
+
+                            <label class="field-label">Detalhe da ausência</label>
+                            <textarea
+                                class="textarea-xs"
+                                name="absence_detail::{{ d.dev }}"
+                                placeholder="Detalhe curto da ausência."
+                            ></textarea>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">Observação geral</div>
+                            <textarea
+                                class="textarea-sm"
+                                name="note::{{ d.dev }}"
+                                placeholder="Observação geral da daily."
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="save-bar">
+            <button type="submit" class="save-button">Salvar daily</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.innerText = text || "";
+    return div.innerHTML;
+}
+
+function syncBlockers(devName) {
+    const container = document.getElementById(`blockers-${devName}`);
+    const selector = `input[type="checkbox"][data-dev="${CSS.escape(devName)}"]`;
+    const checkedBoxes = Array.from(document.querySelectorAll(selector)).filter(cb => cb.checked);
+
+    container.innerHTML = "";
+
+    if (checkedBoxes.length === 0) {
+        container.innerHTML = '<div class="muted">Nenhum card marcado para hoje.</div>';
+        return;
+    }
+
+    checkedBoxes.forEach(cb => {
+        const cardId = cb.dataset.cardId || "";
+        const cardName = cb.dataset.cardName || "";
+        const clientName = cb.dataset.clientName || "";
+        const hasBlockLabel = cb.dataset.hasBlockLabel || "0";
+
+        const warningHtml = hasBlockLabel === "0"
+            ? '<div class="block-warning">Se houver bloqueio neste card, marque o rótulo BLOCK no Trello.</div>'
+            : '';
+
+        const itemHtml = `
+            <div class="blocker-item">
+                <div class="blocker-title">${escapeHtml(cardName)} ${clientName ? '— ' + escapeHtml(clientName) : ''}</div>
+                <input
+                    type="text"
+                    name="blocker_item::${escapeHtml(devName)}::${escapeHtml(cardId)}"
+                    placeholder="Descreva o bloqueio deste card, se houver"
+                >
+                ${warningHtml}
+            </div>
+        `;
+
+        container.insertAdjacentHTML("beforeend", itemHtml);
+    });
+}
+
+function filterAdditionalCards(containerId, inputId, resultId) {
+    const container = document.getElementById(containerId);
+    const input = document.getElementById(inputId);
+    const result = document.getElementById(resultId);
+
+    if (!container || !input || !result) {
+        return;
+    }
+
+    const term = input.value.trim().toLowerCase();
+    const items = container.querySelectorAll(".additional-card-item");
+    let visibleCount = 0;
+
+    items.forEach(item => {
+        const haystack = item.dataset.search || "";
+        const match = !term || haystack.includes(term);
+
+        item.style.display = match ? "" : "none";
+
+        if (match) {
+            visibleCount += 1;
+        }
+    });
+
+    result.innerText = `${visibleCount} card(s) encontrado(s)`;
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const devCards = document.querySelectorAll(".dev-card");
+    devCards.forEach(card => {
+        const devNameEl = card.querySelector(".dev-top");
+        if (devNameEl) {
+            syncBlockers(devNameEl.textContent.trim());
+        }
+    });
+});
+</script>
+
+</body>
+</html>
+
