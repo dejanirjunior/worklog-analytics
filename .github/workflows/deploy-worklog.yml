@@ -1,4 +1,4 @@
-name: Deploy Worklog to AWS
+name: Deploy Worklog + Trello to AWS
 
 on:
   workflow_dispatch:
@@ -16,7 +16,16 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
             set -e
+
+            echo "=== WORKLOG ==="
             cd /home/ubuntu/apps/worklog-analytics
             git pull
             docker compose up -d --build
+
+            echo "=== TRELLO ==="
+            cd /home/ubuntu/apps/trello-dashboard
+            git pull
+            docker compose up -d --build
+
+            echo "=== FINAL ==="
             docker ps
