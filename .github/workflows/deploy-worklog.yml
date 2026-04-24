@@ -1,0 +1,22 @@
+name: Deploy Worklog to AWS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            set -e
+            cd /home/ubuntu/apps/worklog-analytics
+            git pull
+            docker compose up -d --build
+            docker ps
