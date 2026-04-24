@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Portal de Projetos</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .logo {
+            max-width: 160px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 14px;
+            width: 240px;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.03);
+            background: #334155;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+
+<body>
+
+<img src="/assets/logo.jfif" class="logo">
+
+<h1>Portal de Projetos</h1>
+
+<div class="container">
+
+    <div class="card">
+        <a href="/">
+            <h2>⏱️ Registro de Horas</h2>
+            <p>Lançamento de horas por card</p>
+        </a>
+    </div>
+
+    <div class="card">
+        <a href="/trello/views/pm_view.html">
+            <h2>📊 Dashboard</h2>
+            <p>Visão de Projetos</p>
+        </a>
+    </div>
+
+    <div class="card">
+        <a href="/daily">
+            <h2>📝 Daily</h2>
+            <p>Registro diário</p>
+        </a>
+    </div>
+
+    <div class="card">
+        <a href="/worklog_history">
+            <h2>📚 Histórico</h2>
+            <p>Worklog completo</p>
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>
