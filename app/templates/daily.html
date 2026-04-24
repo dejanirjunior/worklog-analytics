@@ -29,6 +29,47 @@
         padding: 20px;
     }
 
+    .top-nav {
+        max-width: 1250px;
+        margin: 0 auto 18px auto;
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px 18px;
+        box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .top-nav-brand {
+        font-weight: 800;
+        font-size: 16px;
+        color: #1f2937;
+    }
+
+    .top-nav-links {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .top-nav-links a {
+        text-decoration: none;
+        color: white;
+        background: #475467;
+        padding: 9px 13px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .top-nav-links a.primary {
+        background: #0d6efd;
+    }
+
     .page-wrap {
         max-width: 1250px;
         margin: 0 auto;
@@ -435,6 +476,17 @@
 </head>
 <body>
 
+<div class="top-nav">
+    <div class="top-nav-brand">Optaris BR</div>
+    <div class="top-nav-links">
+        <a href="/portal">🏠 Portal</a>
+        <a href="/">⏱️ Worklog</a>
+        <a class="primary" href="/daily">📝 Daily</a>
+        <a href="/trello/views/pm_view.html">📊 Dashboard</a>
+        <a href="https://trello.com/b/GJsY9WkS/optaris-br" target="_blank">🧩 Trello</a>
+    </div>
+</div>
+
 <div class="page-wrap">
     <div class="page-header">
         <div class="page-topline">
@@ -444,12 +496,12 @@
             </div>
 
             <div class="page-actions">
-                <a class="secondary" href="/daily_history">Histórico da daily</a>
+                <a class="secondary" href="{{ url_for('daily_history') }}">Histórico da daily</a>
             </div>
         </div>
 
         <div class="filters-box">
-            <form method="GET" action="/daily" class="filters-form">
+            <form method="GET" action="{{ url_for('daily') }}" class="filters-form">
                 <div>
                     <label class="field-label">Data da daily</label>
                     <input type="date" name="date" value="{{ today_iso }}">
@@ -469,7 +521,7 @@
 
                 <div style="display:flex; gap:10px; align-items:flex-end;">
                     <button type="submit" class="filter-button">Aplicar filtros</button>
-                    <a href="/daily" class="clear-button">Limpar</a>
+                    <a href="{{ url_for('daily') }}" class="clear-button">Limpar</a>
                 </div>
             </form>
         </div>
@@ -480,7 +532,7 @@
         </div>
     </div>
 
-    <form method="POST" action="/save_daily">
+    <form method="POST" action="{{ url_for('save_daily') }}">
         <input type="hidden" name="date" value="{{ today_iso }}">
 
         {% for d in data %}
@@ -777,4 +829,3 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </body>
 </html>
-
