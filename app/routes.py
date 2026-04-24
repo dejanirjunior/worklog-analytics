@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from pathlib import Path
 from datetime import datetime, timedelta, date, timezone
@@ -8,7 +9,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from app.trello_reader import load_cards
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DB_PATH = BASE_DIR / "worklog.db"
+DB_PATH = Path(os.getenv("WORKLOG_DB_PATH", BASE_DIR / "worklog.db"))
 SCHEMA_PATH = BASE_DIR / "app" / "schema.sql"
 TRELLO_CSV_PATH = Path("/home/junior/trello-dashboard/data/cards_enriched.csv")
 
