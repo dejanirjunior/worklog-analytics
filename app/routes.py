@@ -14,6 +14,8 @@ SCHEMA_PATH = BASE_DIR / "app" / "schema.sql"
 TRELLO_CSV_PATH = Path("/home/junior/trello-dashboard/data/cards_enriched.csv")
 
 app = Flask(__name__)
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_prefix=1)
 
 
 def init_db():

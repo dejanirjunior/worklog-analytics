@@ -206,11 +206,11 @@
         <p>Visualização das dailies já salvas no banco, com cards, bloqueios e ausências.</p>
 
         <div class="actions">
-            <a class="secondary" href="/daily">Voltar para Daily</a>
+            <a class="secondary" href="{{ url_for('daily') }}">Voltar para Daily</a>
         </div>
 
         <div class="filters-box">
-            <form method="GET" action="/daily_history" class="filters-form">
+            <form method="GET" action="{{ url_for('daily_history')  }}" class="filters-form">
                 <div>
                     <label>Desenvolvedor</label>
                     <select name="developer_name">
@@ -235,7 +235,7 @@
 
                 <div style="display:flex; gap:10px; align-items:flex-end;">
                     <button type="submit" class="filter-button">Aplicar filtros</button>
-                    <a href="/daily_history" class="clear-button">Limpar</a>
+                    <a href="{{ url_for('daily_history') }}" class="clear-button">Limpar</a>
                 </div>
             </form>
         </div>
