@@ -26,6 +26,7 @@ jobs:
             cd /home/ubuntu/apps/trello-dashboard
             git pull
             docker compose up -d --build
+            docker exec trello-dashboard-container python3 app/main.py
 
             echo "=== FINAL ==="
             docker ps
