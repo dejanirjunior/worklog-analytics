@@ -5,8 +5,8 @@ services:
     ports:
       - "8003:8003"
     volumes:
-      - /home/ubuntu/apps/trello-dashboard/data:/home/junior/trello-dashboard/data:ro
-      - /home/ubuntu/apps/worklog-analytics/data:/app/data
+      - ./data:/app/data
+      - ../trello-dashboard/data:/home/junior/trello-dashboard/data:ro
     environment:
       - WORKLOG_DB_PATH=/app/data/worklog.db
     restart: unless-stopped
