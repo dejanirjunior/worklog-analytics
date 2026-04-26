@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   worklog-analytics:
     build: .
@@ -5,8 +7,11 @@ services:
     ports:
       - "8003:8003"
     volumes:
+      - ./app:/app/app
       - ./data:/app/data
-      - ../trello-dashboard/data:/home/junior/trello-dashboard/data:ro
-    environment:
-      - WORKLOG_DB_PATH=/app/data/worklog.db
+      - trello-dashboard_trello_auth_data:/data:ro
     restart: unless-stopped
+
+volumes:
+  trello-dashboard_trello_auth_data:
+    external: true

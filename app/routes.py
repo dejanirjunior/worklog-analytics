@@ -14,6 +14,42 @@ SCHEMA_PATH = BASE_DIR / "app" / "schema.sql"
 TRELLO_CSV_PATH = Path("/home/junior/trello-dashboard/data/cards_enriched.csv")
 
 app = Flask(__name__)
+
+# =========================
+# AUTH COMPARTILHADO (TRELLO)
+# =========================
+AUTH_DB_PATH = Path("/data/auth.db")
+
+def get_current_user():
+    username = request.cookies.get("session")
+
+    if not username:
+        return None
+
+    conn = sqlite3.connect(AUTH_DB_PATH)
+    conn.row_factory = sqlite3.Row
+
+    user = conn.execute(
+        "SELECT username, role FROM users WHERE username = ? AND active = 1",
+        (username,)
+    ).fetchone()
+
+    conn.close()
+
+    return dict(user) if user else None
+
+
+def require_login():
+    user = get_current_user()
+
+    if not user:
+        return redirect("https://app.optarisbrasil.com/login")
+
+    if user["role"] not in ["admin", "internal"]:
+        return "Acesso negado", 403
+
+    return None
+
 from werkzeug.middleware.proxy_fix import ProxyFix
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_prefix=1)
 
@@ -414,6 +450,10 @@ def get_worklogs(selected_date=None, selected_dev=None, start_date=None, end_dat
 
 @app.route("/")
 def index():
+    guard = require_login()
+    if guard:
+        return guard
+
     cards = load_cards()
     developers = get_devs()
 
@@ -438,6 +478,10 @@ def index():
 
 @app.route("/save_worklog_batch", methods=["POST"])
 def save_worklog_batch():
+    guard = require_login()
+    if guard:
+        return guard
+
     work_date = request.form.get("work_date", "").strip()
     developer_name = request.form.get("developer_name", "").strip()
 
@@ -498,7 +542,12 @@ def save_worklog_batch():
 
 
 @app.route("/worklog_history")
+
 def worklog_history():
+    guard = require_login()
+    if guard:
+        return guard
+
     developers = get_devs()
 
     selected_dev = request.args.get("developer_name", "").strip()
@@ -531,6 +580,9 @@ def worklog_history():
 
 @app.route("/daily")
 def daily():
+    guard = require_login()
+    if guard:
+        return guard
     selected_date = request.args.get("date")
     selected_dev = request.args.get("developer_name", "").strip()
 
@@ -552,6 +604,9 @@ def daily():
 
 @app.route("/save_daily", methods=["POST"])
 def save_daily():
+    guard = require_login()
+    if guard:
+        return guard
     db = conn()
     daily_date = request.form["date"]
 
@@ -627,6 +682,9 @@ def save_daily():
 
 @app.route("/daily_history")
 def daily_history():
+    guard = require_login()
+    if guard:
+        return guard
     selected_dev = request.args.get("developer_name", "").strip()
     start_date = request.args.get("start_date", "").strip()
     end_date = request.args.get("end_date", "").strip()
