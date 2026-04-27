@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   worklog-analytics:
     build: .
@@ -10,6 +8,11 @@ services:
       - ./app:/app/app
       - ./data:/app/data
       - trello-dashboard_trello_auth_data:/data:ro
+    environment:
+      - WORKLOG_DB_PATH=/app/data/worklog.db
+      - AUTH_DB_PATH=/data/auth.db
+      - TRELLO_CSV_PATH=/app/data/cards_enriched.csv
+      - APP_SECRET_KEY=change-this-secret-key
     restart: unless-stopped
 
 volumes:

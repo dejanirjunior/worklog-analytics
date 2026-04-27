@@ -4,37 +4,56 @@ from pathlib import Path
 from datetime import datetime, timedelta, date, timezone
 
 import pandas as pd
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 
 from app.trello_reader import load_cards
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DB_PATH = Path(os.getenv("WORKLOG_DB_PATH", BASE_DIR / "worklog.db"))
+
+# Banco próprio do Worklog: horas, daily e histórico.
+WORKLOG_DB_PATH = Path(os.getenv("WORKLOG_DB_PATH", BASE_DIR / "data" / "worklog.db"))
+
+# Banco compartilhado com o Trello Dashboard: usuários, roles e clientes.
+AUTH_DB_PATH = Path(os.getenv("AUTH_DB_PATH", "/data/auth.db"))
+
+DB_PATH = WORKLOG_DB_PATH
 SCHEMA_PATH = BASE_DIR / "app" / "schema.sql"
-TRELLO_CSV_PATH = Path("/home/junior/trello-dashboard/data/cards_enriched.csv")
+TRELLO_CSV_PATH = Path(os.getenv("TRELLO_CSV_PATH", "/app/data/cards_enriched.csv"))
 
 app = Flask(__name__)
+app.secret_key = os.getenv("APP_SECRET_KEY", "change-this-secret-key")
+
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_prefix=1)
+
 
 # =========================
-# AUTH COMPARTILHADO (TRELLO)
+# AUTENTICAÇÃO COMPARTILHADA
 # =========================
-AUTH_DB_PATH = Path("/data/auth.db")
 
 def get_current_user():
-    username = request.cookies.get("session")
+    username = session.get("user")
 
     if not username:
         return None
 
-    conn = sqlite3.connect(AUTH_DB_PATH)
-    conn.row_factory = sqlite3.Row
+    if not AUTH_DB_PATH.exists():
+        return None
 
-    user = conn.execute(
-        "SELECT username, role FROM users WHERE username = ? AND active = 1",
+    connection = sqlite3.connect(AUTH_DB_PATH)
+    connection.row_factory = sqlite3.Row
+
+    user = connection.execute(
+        """
+        SELECT username, role, active
+        FROM users
+        WHERE username = ?
+          AND active = 1
+        """,
         (username,)
     ).fetchone()
 
-    conn.close()
+    connection.close()
 
     return dict(user) if user else None
 
@@ -49,10 +68,6 @@ def require_login():
         return "Acesso negado", 403
 
     return None
-
-from werkzeug.middleware.proxy_fix import ProxyFix
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_prefix=1)
-
 
 def init_db():
     connection = sqlite3.connect(DB_PATH)
@@ -448,7 +463,7 @@ def get_worklogs(selected_date=None, selected_dev=None, start_date=None, end_dat
     return rows, total_hours
 
 
-@app.route("/")
+@app.route("/registro-horas")
 def index():
     guard = require_login()
     if guard:
@@ -583,6 +598,10 @@ def daily():
     guard = require_login()
     if guard:
         return guard
+
+    guard = require_login()
+    if guard:
+        return guard
     selected_date = request.args.get("date")
     selected_dev = request.args.get("developer_name", "").strip()
 
@@ -604,6 +623,10 @@ def daily():
 
 @app.route("/save_daily", methods=["POST"])
 def save_daily():
+    guard = require_login()
+    if guard:
+        return guard
+
     guard = require_login()
     if guard:
         return guard
@@ -682,6 +705,10 @@ def save_daily():
 
 @app.route("/daily_history")
 def daily_history():
+    guard = require_login()
+    if guard:
+        return guard
+
     guard = require_login()
     if guard:
         return guard
