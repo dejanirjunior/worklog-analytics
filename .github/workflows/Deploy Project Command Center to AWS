@@ -1,0 +1,36 @@
+name: Deploy Project Command Center to AWS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "=== PROJECT COMMAND CENTER ==="
+            cd /home/ubuntu/apps/trello-dashboard
+
+            git fetch origin
+            git pull origin main
+
+            docker compose up -d --build
+
+            echo "=== RUN TRELLO PIPELINE ==="
+            docker exec trello-dashboard-container python /app/app/main.py
+
+            echo "=== HEALTH CHECK ==="
+            curl -I http://localhost:8001/login
+            curl -I http://localhost:8001/admin/project-costs
+
+            echo "=== CONTAINERS ==="
+            docker ps
